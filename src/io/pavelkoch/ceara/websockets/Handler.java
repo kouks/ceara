@@ -3,6 +3,8 @@ package io.pavelkoch.ceara.websockets;
 import com.google.gson.Gson;
 import io.pavelkoch.ceara.Ceara;
 import io.pavelkoch.ceara.exceptions.ExceptionHandler;
+import io.pavelkoch.ceara.mind.Core;
+import io.pavelkoch.ceara.mind.Position;
 import io.pavelkoch.ceara.mind.State;
 import io.pavelkoch.ceara.websockets.models.*;
 
@@ -38,8 +40,6 @@ public class Handler implements MessageHandler.Whole<String> {
      */
     @Override
     public void onMessage(String message) {
-        System.out.println(message);
-
         // Receive the event type from the message using the beautiful
         // Google gson library.
         EventType event = EventType.fromString(
@@ -70,20 +70,21 @@ public class Handler implements MessageHandler.Whole<String> {
                 this.respond(new ReadyResponse());
                 break;
             case TOURNAMENT_OVER:
-                Ceara.terminate();
+                // Ceara.terminate();
+                break;
+            case NEW_GAME:
+                String side = this.gson.fromJson(message, NewGameEventBag.class).side;
+                Ceara.getMind().setSide(side);
                 break;
             case YOUR_MOVE:
                 YourMoveEventBag eventBag = this.gson.fromJson(message, YourMoveEventBag.class);
                 State state = new State(eventBag.state, eventBag.moves);
 
-                // TEST ZONE
-                System.out.println(Arrays.deepToString(eventBag.state));
-                System.out.println(Arrays.toString(eventBag.moves));
-                System.out.println("move: ");
-                int x = new Scanner(System.in).nextInt();
-                int y = new Scanner(System.in).nextInt();
-                this.respond(new MoveResponse(x, y));
-                // END TEST ZONE
+                Core core = Ceara.getMind();
+                core.setCurrentState(state);
+                Position move = core.requestNextMove();
+
+                this.respond(new MoveResponse(move.getX(), move.getY()));
 
                 break;
         }

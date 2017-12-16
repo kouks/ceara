@@ -2,6 +2,7 @@ package io.pavelkoch.ceara.websockets;
 
 public enum EventType {
     HELLO("hello"),
+    NEW_GAME("new_game"),
     YOUR_MOVE("your_move"),
     GAME_OVER("game_over"),
     TOURNAMENT_OVER("tournament_over");

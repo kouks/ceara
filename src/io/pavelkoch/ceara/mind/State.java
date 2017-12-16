@@ -36,6 +36,10 @@ public class State {
      */
     private YourMoveEventBag.Move[] moves = {};
 
+    public State() {
+        //
+    }
+
     public State(String[][] state, YourMoveEventBag.Move[] moves) {
         this.current = state;
         this.moves = moves;
